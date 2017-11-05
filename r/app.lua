@@ -49,6 +49,7 @@ function M.get_meta()
 
 	-- respond to request for PX file description
 
+	-- require('resty.repl').start()
 
 	ngx.header.content_type = "application/json"
 	
@@ -61,6 +62,14 @@ end
 
 function M.get_data()
 	-- respond to requests for matrix subset
+
+	query = ngx.req.get_uri_args()
+
+	rows = cjson.decode(query.rows)
+	cols = cjson.decode(query.cols)
+
+	ngx.say(cjson.encode({rows, cols}))
+
 end
 
 function M.root()
