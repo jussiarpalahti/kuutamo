@@ -60,10 +60,25 @@ function M.get_meta()
 
 end
 
+function bad_req_response()
+	ngx.status = ngx.HTTP_BAD_REQUEST
+	ngx.say("problem")
+	ngx.exit(ngx.HTTP_OK)
+end
+
 function M.get_data()
 	-- respond to requests for matrix subset
 
 	query = ngx.req.get_uri_args()
+
+	if (query.rows == nil or string.len(query.rows) == 0) 
+	then
+		bad_req_response()
+	end
+	if (query.cols == nil or string.len(query.cols) == 0) 
+	then
+		bad_req_response()
+	end
 
 	rows = cjson.decode(query.rows)
 	cols = cjson.decode(query.cols)
