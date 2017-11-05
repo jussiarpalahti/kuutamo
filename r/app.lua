@@ -39,8 +39,22 @@ function parse_data( ... )
 	-- data to matrix
 end
 
-function select_data( ... )
+function select_data(data, rows, cols)
 	-- row and col index lists to matrix subset
+	
+	res = {}
+	
+	-- require('resty.repl').start()
+
+	for r = 1, #rows do
+		res[r] = {}
+		for c = 1, #cols do
+			res[r][c] = data[rows[r]][cols[c]]
+		end
+	end
+
+	return res
+
 end
 
 local M = {}
@@ -48,8 +62,6 @@ local M = {}
 function M.get_meta()
 
 	-- respond to request for PX file description
-
-	-- require('resty.repl').start()
 
 	ngx.header.content_type = "application/json"
 	
@@ -83,7 +95,13 @@ function M.get_data()
 	rows = cjson.decode(query.rows)
 	cols = cjson.decode(query.cols)
 
-	ngx.say(cjson.encode({rows, cols}))
+	ngx.header.content_type = "application/json"
+	
+	data = read_px_file('data/d.txt')
+
+	res = select_data(data, rows, cols)
+
+	ngx.say(cjson.encode(res))
 
 end
 
