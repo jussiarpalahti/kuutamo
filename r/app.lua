@@ -15,19 +15,9 @@ function read_px_file( doc )
 
 	d = io.open(doc):read('*a')
 
-	meta, d = unpack(stringx.split(d, 'DATA='))
+	meta_part, data_part = unpack(stringx.split(d, 'DATA='))
 
-	data = stringx.split(stringx.strip(d), '\n')
-
-	res = {}
-
-	for i = 1, #data do
-		if data[i] ~= "" then
-			res[i] = stringx.split(data[i])
-		end
-	end
-
-	return res
+	return meta_part, data_part
 
 end
 
@@ -35,16 +25,26 @@ function parse_meta( ... )
 	-- meta to table
 end
 
-function parse_data( ... )
+function parse_data(data_part)
 	-- data to matrix
+	data_lines = stringx.split(stringx.strip(data_part), '\n')
+
+	data = {}
+
+	for i = 1, #data_lines do
+		if data_lines[i] ~= "" then
+			data[i] = stringx.split(data_lines[i])
+		end
+	end
+	
+	return data
+
 end
 
 function select_data(data, rows, cols)
 	-- row and col index lists to matrix subset
 	
 	res = {}
-	
-	-- require('resty.repl').start()
 
 	for r = 1, #rows do
 		res[r] = {}
@@ -65,9 +65,9 @@ function M.get_meta()
 
 	ngx.header.content_type = "application/json"
 	
-	res = read_px_file('data/d.txt')
+	meta, data = read_px_file('data/d.txt')
 
-	ngx.say(cjson.encode(res))
+	ngx.say(cjson.encode(meta))
 	
 
 end
@@ -97,9 +97,9 @@ function M.get_data()
 
 	ngx.header.content_type = "application/json"
 	
-	data = read_px_file('data/d.txt')
+	meta, data = read_px_file('data/d.txt')
 
-	res = select_data(data, rows, cols)
+	res = select_data(parse_data(data), rows, cols)
 
 	ngx.say(cjson.encode(res))
 
@@ -108,5 +108,7 @@ end
 function M.root()
 	ngx.say('jei!')
 end
+	
+-- require('resty.repl').start()
 
 return M
