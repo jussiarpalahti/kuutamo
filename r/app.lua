@@ -10,8 +10,27 @@ local stringx = require 'pl.stringx'
 local seq = require( 'pl.seq' )
 local tablex = require( 'tablex' )
 
-function read_px_file( ... )
+function read_px_file( doc )
 	-- read file, split into header and data part
+
+	d = io.open(doc):read('*a')
+
+	meta, d = unpack(stringx.split(d, 'DATA='))
+
+	data = stringx.split(stringx.strip(d), '\n')
+
+	res = {}
+
+	for i = 1, #data do
+		if data[i] ~= "" then
+			res[i] = stringx.split(data[i])
+		end
+	end
+
+	-- require('resty.repl').start()
+
+	return res
+
 end
 
 function parse_meta( ... )
@@ -31,19 +50,10 @@ function get_meta()
 
 	-- respond to request for PX file description
 
-	d = io.open('data/d.txt'):read('*a')
 
 	ngx.header.content_type = "application/json"
 	
-	res = {}
-	l = stringx.split(d, '\n')
-
-	for i = 1, #l do
-		if l[i] ~= "" then
-			res[i] = stringx.split(l[i])
-		end
-	end
-
+	res = read_px_file('data/d.txt')
 
 	ngx.say(cjson.encode(res))
 	
@@ -56,4 +66,4 @@ function get_data( ... )
 end
 
 
-get_meta();
+get_meta()
