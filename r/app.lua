@@ -27,8 +27,6 @@ function read_px_file( doc )
 		end
 	end
 
-	-- require('resty.repl').start()
-
 	return res
 
 end
@@ -45,8 +43,9 @@ function select_data( ... )
 	-- row and col index lists to matrix subset
 end
 
+local M = {}
 
-function get_meta()
+function M.get_meta()
 
 	-- respond to request for PX file description
 
@@ -60,10 +59,12 @@ function get_meta()
 
 end
 
-
-function get_data( ... )
+function M.get_data()
 	-- respond to requests for matrix subset
 end
 
+function M.root()
+	ngx.say('jei!')
+end
 
-get_meta()
+return M
