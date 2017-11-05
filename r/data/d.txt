@@ -1,5 +1,7 @@
-ma=1
-mb=2
+ma=1;
+mb=2;
+mc="show me to 
+	the moon";
 DATA=
 1 2 3
 4 5 6

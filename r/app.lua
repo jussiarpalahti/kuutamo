@@ -21,12 +21,25 @@ function read_px_file( doc )
 
 end
 
-function parse_meta( ... )
+function parse_meta(meta_part)
 	-- meta to table
+
+	meta = {}
+
+	RE_META = "(%a-)=(.-);\n"
+
+	for key, value in string.gmatch(meta_part, RE_META) 
+	do 
+		meta[key] = value
+	end
+
+	return meta
+
 end
 
 function parse_data(data_part)
 	-- data to matrix
+
 	data_lines = stringx.split(stringx.strip(data_part), '\n')
 
 	data = {}
@@ -62,14 +75,15 @@ local M = {}
 function M.get_meta()
 
 	-- respond to request for PX file description
+	
+	meta_part, data = read_px_file('data/d.txt')
+
+	meta = parse_meta(meta_part)
 
 	ngx.header.content_type = "application/json"
-	
-	meta, data = read_px_file('data/d.txt')
 
 	ngx.say(cjson.encode(meta))
 	
-
 end
 
 function bad_req_response()
@@ -94,13 +108,13 @@ function M.get_data()
 
 	rows = cjson.decode(query.rows)
 	cols = cjson.decode(query.cols)
-
-	ngx.header.content_type = "application/json"
 	
 	meta, data = read_px_file('data/d.txt')
 
 	res = select_data(parse_data(data), rows, cols)
 
+	ngx.header.content_type = "application/json"
+	
 	ngx.say(cjson.encode(res))
 
 end
