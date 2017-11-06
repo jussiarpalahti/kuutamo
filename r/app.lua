@@ -21,17 +21,39 @@ function read_px_file( doc )
 
 end
 
+function clean_value(value)
+	-- get a list of strings from 
+	-- a string of comma separated quoted strings
+
+	lines = {}
+	
+	for s in value:gmatch('"(.-)"') do
+		table.insert(lines, s) 
+	end
+
+	return lines
+
+end
+
 function parse_meta(meta_part)
 	-- meta to table
 
 	meta = {}
 
-	RE_META = "(%a-)=(.-);\n"
+	-- RE_META = "(%a-)=(.-);\n"
 
-	for key, value in string.gmatch(meta_part, RE_META) 
-	do 
-		meta[key] = value
-	end
+	stripped = stringx.strip(meta_part)
+
+	fields = stringx.split(stripped, ';\n')
+
+    for l = 1, #fields do
+
+    	field, value = unpack(stringx.split(fields[l], '=', 2))
+
+    	if not stringx.startswith(field, 'NOTE') then
+    		meta[field] = clean_value(value)
+    	end
+    end
 
 	return meta
 
@@ -76,7 +98,7 @@ function M.get_meta()
 
 	-- respond to request for PX file description
 	
-	meta_part, data = read_px_file('data/d.txt')
+	meta_part, data = read_px_file('data/pd.px')
 
 	meta = parse_meta(meta_part)
 
@@ -109,12 +131,12 @@ function M.get_data()
 	rows = cjson.decode(query.rows)
 	cols = cjson.decode(query.cols)
 	
-	meta, data = read_px_file('data/d.txt')
+	meta, data = read_px_file('data/pd.px')
 
 	res = select_data(parse_data(data), rows, cols)
 
 	ngx.header.content_type = "application/json"
-	
+
 	ngx.say(cjson.encode(res))
 
 end
