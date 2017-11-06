@@ -31,7 +31,11 @@ function clean_value(value)
 		table.insert(lines, s) 
 	end
 
-	return lines
+	if #lines == 1 then 
+		return lines[1]
+	else
+		return lines
+	end
 
 end
 
