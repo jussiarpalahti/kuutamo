@@ -28,15 +28,16 @@ function clean_value(value)
 	lines = {}
 	
 	for s in value:gmatch('"(.-)"') do
-		table.insert(lines, s) 
+		table.insert(lines, s)
 	end
 
-	if #lines == 1 then 
+	if #lines == 0 then
+		return value
+	elseif #lines == 1 then 
 		return lines[1]
 	else
 		return lines
 	end
-
 end
 
 function parse_meta(meta_part)
